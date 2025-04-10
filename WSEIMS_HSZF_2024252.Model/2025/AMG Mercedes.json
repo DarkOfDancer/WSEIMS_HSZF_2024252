@@ -1,0 +1,45 @@
+{ 
+  "teamName": "AMG Mercedes", 
+  "year": 2025, 
+  "headquarters": "London, UK", 
+  "teamPrincipal": "Toto Wolff", 
+  "constructorsChampionshipWins": 4, 
+  "budget": { 
+    "totalBudget": 150000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 58000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-01-17", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 23000000 }, 
+          { "name": "Engine", "amount": 18000000 }, 
+          { "name": "Chassis", "amount": 17000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 62000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-02-05", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 27000000 }, 
+          { "name": "Engineer", "amount": 20000000 }, 
+          { "name": "Pit Crew", "amount": 15000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 30000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2025-03-09", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 12000000 }, 
+          { "name": "Marketing", "amount": 10000000 }, 
+          { "name": "Sustainability", "amount": 8000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

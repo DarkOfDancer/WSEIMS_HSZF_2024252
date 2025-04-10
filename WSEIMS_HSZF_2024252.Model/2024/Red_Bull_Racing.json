@@ -1,0 +1,45 @@
+{ 
+  "teamName": "Red Bull Racing", 
+  "year": 2024, 
+  "headquarters": "Milton Keynes, UK", 
+  "teamPrincipal": "Christian Horner", 
+  "constructorsChampionshipWins": 6, 
+  "budget": { 
+    "totalBudget": 145000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 55000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-01-20", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 25000000 }, 
+          { "name": "Engine", "amount": 18000000 }, 
+          { "name": "Chassis", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 50000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-02-05", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 20000000 }, 
+          { "name": "Engineer", "amount": 18000000 }, 
+          { "name": "Pit Crew", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 40000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2024-03-15", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 18000000 }, 
+          { "name": "Marketing", "amount": 12000000 }, 
+          { "name": "Travel", "amount": 10000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

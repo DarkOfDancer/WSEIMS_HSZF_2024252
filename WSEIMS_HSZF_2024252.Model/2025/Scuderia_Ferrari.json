@@ -1,0 +1,45 @@
+{ 
+  "teamName": "Scuderia Ferrari", 
+  "year": 2025, 
+  "headquarters": "Maranello, Italy", 
+  "teamPrincipal": "Frédéric Vasseur", 
+  "constructorsChampionshipWins": 17, 
+  "budget": { 
+    "totalBudget": 155000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 60000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-01-10", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 25000000 }, 
+          { "name": "Engine", "amount": 20000000 }, 
+          { "name": "Battery Systems", "amount": 15000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 65000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2025-02-15", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 30000000 }, 
+          { "name": "Engineer", "amount": 20000000 }, 
+          { "name": "Pit Crew", "amount": 15000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 30000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-03-07", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 10000000 }, 
+          { "name": "Marketing", "amount": 12000000 }, 
+          { "name": "Sponsorship Events", "amount": 8000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

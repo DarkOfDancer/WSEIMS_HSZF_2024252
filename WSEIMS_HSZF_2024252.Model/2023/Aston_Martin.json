@@ -1,0 +1,45 @@
+{ 
+  "teamName": "Aston Martin Aramco Cognizant F1 Team", 
+  "year": 2023, 
+  "headquarters": "Silverstone, UK", 
+  "teamPrincipal": "Mike Krack", 
+  "constructorsChampionshipWins": 0, 
+  "budget": { 
+    "totalBudget": 132000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 48000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2023-01-11", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 19000000 }, 
+          { "name": "Engine", "amount": 16000000 }, 
+          { "name": "Chassis", "amount": 13000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 54000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2023-02-02", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 22000000 }, 
+          { "name": "Engineer", "amount": 17000000 }, 
+          { "name": "Pit Crew", "amount": 15000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 30000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2023-03-08", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 11000000 }, 
+          { "name": "Marketing", "amount": 10000000 }, 
+          { "name": "Travel", "amount": 9000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

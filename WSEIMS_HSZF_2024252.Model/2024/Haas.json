@@ -1,0 +1,45 @@
+{ 
+  "teamName": "MoneyGram Haas F1 Team", 
+  "year": 2024, 
+  "headquarters": "Kannapolis, USA", 
+  "teamPrincipal": "Ayao Komatsu", 
+  "constructorsChampionshipWins": 0, 
+  "budget": { 
+    "totalBudget": 120000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 35000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-01-08", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 15000000 }, 
+          { "name": "Engine", "amount": 10000000 }, 
+          { "name": "Chassis", "amount": 10000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 45000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2024-02-10", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 18000000 }, 
+          { "name": "Engineer", "amount": 15000000 }, 
+          { "name": "Pit Crew", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 40000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-03-12", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 17000000 }, 
+          { "name": "Marketing", "amount": 13000000 }, 
+          { "name": "Travel", "amount": 10000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

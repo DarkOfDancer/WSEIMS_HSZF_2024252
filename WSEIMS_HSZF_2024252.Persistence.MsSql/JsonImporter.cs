@@ -1,0 +1,113 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using WSEIMS_HSZF_2024252.Model;
+using WSEIMS_HSZF_2024252.Persistence.MsSql;
+
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using WSEIMS_HSZF_2024252.Model;
+using WSEIMS_HSZF_2024252.Persistence.MsSql;
+
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using WSEIMS_HSZF_2024252.Model;
+using WSEIMS_HSZF_2024252.Persistence.MsSql;
+
+public class JsonImporter
+{
+    // Beolvasás egyetlen JSON fájlból
+    public TeamEntity ReadJsonFile(string filePath)
+    {
+        try
+        {
+            // JSON fájl beolvasása
+            string json = File.ReadAllText(filePath);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            // A JSON deszerializálása TeamEntity típusra
+            var team = JsonSerializer.Deserialize<TeamEntity>(json, options);
+            return team;
+        }
+        catch (Exception)
+        {
+            // Hiba esetén null visszaadása
+            return null;
+        }
+    }
+
+    // Importálás a JSON fájlokból és adatbázisba
+    public List<TeamEntity> ImportTeamsFromJsonDirectory(string rootDirectory)
+    {
+        // Ellenőrizzük, hogy létezik-e a könyvtár
+        if (!Directory.Exists(rootDirectory))
+        {
+            return null; // Könyvtár nem található
+        }
+
+        var allTeams = new List<TeamEntity>();
+        var yearDirectories = Directory.GetDirectories(rootDirectory); // Az összes év mappa
+
+        foreach (var yearDirectory in yearDirectories)
+        {
+            // Csak azokat a mappákat dolgozzuk fel, amelyek évszámot tartalmaznak a nevükben
+            string folderName = Path.GetFileName(yearDirectory);
+            if (!IsYearFolder(folderName))
+            {
+                continue; // Ha nem tartalmaz évet, akkor kihagyjuk
+            }
+
+            // Minden egyes év mappájában lévő JSON fájlokat keresünk
+            var files = Directory.GetFiles(yearDirectory, "*.json");
+
+            foreach (var filePath in files)
+            {
+                // Beolvassuk az adott fájlt
+                var team = ReadJsonFile(filePath);
+
+                if (team != null)
+                {
+                    // Ellenőrizzük, hogy már létezik-e ugyanaz a csapat az adatbázisban
+                    using (var context = new FormulaOneDbContext())
+                    {
+                        var existingTeam = context.Teams
+                            .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
+
+                        if (existingTeam == null)
+                        {
+                            // Ha nem létezik, hozzáadjuk az adatbázishoz
+                            context.Teams.Add(team);
+                            context.SaveChanges();
+                            allTeams.Add(team);
+                        }
+                    }
+                }
+            }
+        }
+
+        return allTeams; // Visszaadjuk az importált csapatokat
+    }
+
+    // Ellenőrizzük, hogy a mappa neve tartalmaz-e évet (4 számjegy)
+    private bool IsYearFolder(string folderName)
+    {
+        // Ellenőrizzük, hogy a mappa neve 4 számjegyből áll (pl. 2023)
+        return folderName.Length == 4 && folderName.All(char.IsDigit);
+    }
+}
+
+

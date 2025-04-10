@@ -1,0 +1,45 @@
+{ 
+  "teamName": "McLaren F1 Team", 
+  "year": 2023, 
+  "headquarters": "Woking, UK", 
+  "teamPrincipal": "Andrea Stella", 
+  "constructorsChampionshipWins": 8, 
+  "budget": { 
+    "totalBudget": 130000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 44000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2023-01-19", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 19000000 }, 
+          { "name": "Engine", "amount": 13000000 }, 
+          { "name": "Chassis", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 54000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2023-02-06", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 20000000 }, 
+          { "name": "Engineer", "amount": 18000000 }, 
+          { "name": "Pit Crew", "amount": 16000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 32000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2023-03-10", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 12000000 }, 
+          { "name": "Marketing", "amount": 11000000 }, 
+          { "name": "Travel", "amount": 9000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

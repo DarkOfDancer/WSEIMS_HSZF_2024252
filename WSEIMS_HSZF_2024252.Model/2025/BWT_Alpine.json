@@ -1,0 +1,45 @@
+{ 
+  "teamName": "BWT Alpine F1 Team", 
+  "year": 2025, 
+  "headquarters": "Enstone, UK", 
+  "teamPrincipal": "Davide Brivio", 
+  "constructorsChampionshipWins": 0, 
+  "budget": { 
+    "totalBudget": 138000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 47000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-01-13", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 20000000 }, 
+          { "name": "Engine", "amount": 15000000 }, 
+          { "name": "Chassis", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 55000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2025-02-07", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 22000000 }, 
+          { "name": "Engineer", "amount": 18000000 }, 
+          { "name": "Pit Crew", "amount": 15000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 36000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-03-11", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 15000000 }, 
+          { "name": "Marketing", "amount": 13000000 }, 
+          { "name": "Sustainability", "amount": 8000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

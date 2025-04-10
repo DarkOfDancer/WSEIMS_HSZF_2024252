@@ -1,0 +1,45 @@
+{ 
+  "teamName": "MoneyGram Haas F1 Team", 
+  "year": 2025, 
+  "headquarters": "Kannapolis, USA", 
+  "teamPrincipal": "Ayao Komatsu", 
+  "constructorsChampionshipWins": 0, 
+  "budget": { 
+    "totalBudget": 125000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 37000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-01-09", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 16000000 }, 
+          { "name": "Engine", "amount": 11000000 }, 
+          { "name": "Chassis", "amount": 10000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 46000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2025-02-12", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 19000000 }, 
+          { "name": "Engineer", "amount": 15000000 }, 
+          { "name": "Pit Crew", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 42000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2025-03-14", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 18000000 }, 
+          { "name": "Marketing", "amount": 14000000 }, 
+          { "name": "Travel", "amount": 10000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}

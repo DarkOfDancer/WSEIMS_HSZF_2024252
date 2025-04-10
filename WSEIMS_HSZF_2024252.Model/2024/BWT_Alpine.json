@@ -1,0 +1,45 @@
+{ 
+  "teamName": "BWT Alpine F1 Team", 
+  "year": 2024, 
+  "headquarters": "Enstone, UK", 
+  "teamPrincipal": "Bruno Famin", 
+  "constructorsChampionshipWins": 0, 
+  "budget": { 
+    "totalBudget": 135000000, 
+    "expenses": [ 
+      { 
+        "category": "Car Development", 
+        "amount": 40000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-01-14", 
+        "subcategory": [ 
+          { "name": "Aerodynamics", "amount": 16000000 }, 
+          { "name": "Engine", "amount": 14000000 }, 
+          { "name": "Chassis", "amount": 10000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Personnel", 
+        "amount": 50000000, 
+        "approvalStatus": "Approved", 
+        "expenseDate": "2024-02-03", 
+        "subcategory": [ 
+          { "name": "Driver", "amount": 20000000 }, 
+          { "name": "Engineer", "amount": 18000000 }, 
+          { "name": "Pit Crew", "amount": 12000000 } 
+        ] 
+      }, 
+      { 
+        "category": "Operations", 
+        "amount": 45000000, 
+        "approvalStatus": "Pending", 
+        "expenseDate": "2024-03-09", 
+        "subcategory": [ 
+          { "name": "Logistics", "amount": 20000000 }, 
+          { "name": "Marketing", "amount": 15000000 }, 
+          { "name": "Travel", "amount": 10000000 } 
+        ] 
+      } 
+    ] 
+  } 
+}
