@@ -53,54 +53,70 @@ public class JsonImporter
     // Importálás a JSON fájlokból és adatbázisba
     public List<TeamEntity> ImportTeamsFromJsonDirectory(string rootDirectory)
     {
-        // Ellenőrizzük, hogy létezik-e a könyvtár
         if (!Directory.Exists(rootDirectory))
         {
-            return null; // Könyvtár nem található
+            return null;
         }
 
         var allTeams = new List<TeamEntity>();
-        var yearDirectories = Directory.GetDirectories(rootDirectory); // Az összes év mappa
+        var yearDirectories = Directory.GetDirectories(rootDirectory);
 
         foreach (var yearDirectory in yearDirectories)
         {
-            // Csak azokat a mappákat dolgozzuk fel, amelyek évszámot tartalmaznak a nevükben
             string folderName = Path.GetFileName(yearDirectory);
-            if (!IsYearFolder(folderName))
-            {
-                continue; // Ha nem tartalmaz évet, akkor kihagyjuk
-            }
+            if (!IsYearFolder(folderName)) continue;
 
-            // Minden egyes év mappájában lévő JSON fájlokat keresünk
             var files = Directory.GetFiles(yearDirectory, "*.json");
 
             foreach (var filePath in files)
             {
-                // Beolvassuk az adott fájlt
                 var team = ReadJsonFile(filePath);
+                if (team == null) continue;
 
-                if (team != null)
+                using (var context = new FormulaOneDbContext())
                 {
-                    // Ellenőrizzük, hogy már létezik-e ugyanaz a csapat az adatbázisban
-                    using (var context = new FormulaOneDbContext())
-                    {
-                        var existingTeam = context.Teams
-                            .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
+                    var existingTeam = context.Teams
+                        .Include(t => t.budget)
+                        .ThenInclude(b => b.expenses)
+                        .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
 
-                        if (existingTeam == null)
+                    if (existingTeam == null)
+                    {
+                        context.Teams.Add(team);
+                        context.SaveChanges();
+                        allTeams.Add(team);
+                    }
+                    else
+                    {
+                        if (team.budget?.expenses != null && team.budget.expenses.Any())
                         {
-                            // Ha nem létezik, hozzáadjuk az adatbázishoz
-                            context.Teams.Add(team);
+                            foreach (var newExpense in team.budget.expenses)
+                            {
+                                newExpense.BudgetId = existingTeam.budget.Id;
+
+                                // (Opcionális) Ne adjuk hozzá, ha már létezik ugyanolyan költség
+                                bool isDuplicate = existingTeam.budget.expenses.Any(e =>
+                                    e.expenseDate == newExpense.expenseDate &&
+                                    e.amount == newExpense.amount &&
+                                    e.category == newExpense.category);
+
+                                if (!isDuplicate)
+                                {
+                                    context.Expenses.Add(newExpense);
+                                }
+                            }
+
                             context.SaveChanges();
-                            allTeams.Add(team);
+                            allTeams.Add(existingTeam);
                         }
                     }
                 }
             }
         }
 
-        return allTeams; // Visszaadjuk az importált csapatokat
+        return allTeams;
     }
+
 
     // Ellenőrizzük, hogy a mappa neve tartalmaz-e évet (4 számjegy)
     private bool IsYearFolder(string folderName)
