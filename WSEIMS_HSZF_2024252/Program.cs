@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Threading.Tasks;
 using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 
@@ -26,12 +27,11 @@ namespace WSEIMS_HSZF_2024252
                 var input = Console.ReadLine();
                 Console.Clear();
                 
-                
             }
         }
 
         
-        static void StartUpload(string rootDirectory,JsonImporter jsonImporter)
+        static async Task StartUpload(string rootDirectory,JsonImporter jsonImporter)
         {
             // JSON fájlok importálása és eredmény kiírása
             var resultMessage = jsonImporter.ImportTeamsFromJsonDirectory(rootDirectory);
@@ -46,9 +46,9 @@ namespace WSEIMS_HSZF_2024252
             {
                 Console.WriteLine($"Sikeresen importálva {resultMessage.Count} csapat.");
             }
-
+            Thread.Sleep(5000);
         }
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var ctx = new FormulaOneDbContext();
             // A gyökér könyvtár
@@ -56,9 +56,10 @@ namespace WSEIMS_HSZF_2024252
             // Az importáló osztály példányosítása
             var jsonImporter = new JsonImporter();
             StartUpload(rootDirectory,jsonImporter);
+            
             Menu(jsonImporter);
             var service = new TeamService();
-            var result = service.SearchTeams(field, value, exact);
+            //var result = service.SearchTeams(field, value, exact);
         }
     }
 }
