@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace WSEIMS_HSZF_2024252.Model
 {
-    public class Expens
+    public class ExpensEntity
     {
-        public Expens(string category, int amount, string approvalStatus, DateTime expenseDate)
+        /*public ExpensEntity(string category, int amount, string approvalStatus, DateTime expenseDate)
         {
             Id = Guid.NewGuid().ToString();
             this.category = category;
@@ -19,14 +19,14 @@ namespace WSEIMS_HSZF_2024252.Model
             this.expenseDate =expenseDate;
             subcategory = new HashSet<Subcategory>();
         }
-        public Expens()
+        public ExpensEntity()
         {
             subcategory = new HashSet<Subcategory>();
-        }
+        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         // Kategória, összeg, stb.
         public string? category { get; set; }
@@ -35,13 +35,13 @@ namespace WSEIMS_HSZF_2024252.Model
         public DateTime expenseDate { get; set; }
 
         // Idegen kulcs kapcsolódik a Budget entitáshoz
-        public string BudgetId { get; set; }
+        public string? BudgetId { get; set; }
 
         // Navigációs tulajdonság
-        public virtual Budget Budget { get; set; }
+        public virtual BudgetEntity? Budget { get; set; }
 
         // Subcategory-k kapcsolatai
-        public virtual ICollection<Subcategory> subcategory { get; set; }
+        public virtual ICollection<SubcategoryEntity>? subcategory { get; set; }
     }
 }
 

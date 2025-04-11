@@ -11,9 +11,9 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
     public class FormulaOneDbContext: DbContext
     {
         public DbSet<TeamEntity> Teams { get; set; }
-        public DbSet<Expens> Expenses { get; set; }
-        public DbSet<Subcategory> Subcategories { get; set; }
-        public DbSet<Budget> Budgets { get; set; }
+        public DbSet<ExpensEntity> Expenses { get; set; }
+        public DbSet<SubcategoryEntity> Subcategories { get; set; }
+        public DbSet<BudgetEntity> Budgets { get; set; }
 
         public FormulaOneDbContext()
         {

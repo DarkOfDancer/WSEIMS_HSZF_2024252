@@ -9,22 +9,22 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace WSEIMS_HSZF_2024252.Model
 {
-    public class Subcategory
+    public class SubcategoryEntity
     {
-        public Subcategory(string name, int amount)
+        /*public SubcategoryEntity(string name, int amount)
         {
             Id = Guid.NewGuid().ToString();
             this.name = name;
             this.amount = amount;
         }
-        public Subcategory()
+        public SubcategoryEntity()
         {
             Id = Guid.NewGuid().ToString();
-        }
+        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         // A subcategory neve és összege
         [StringLength(100)]
         public string? name { get; set; }

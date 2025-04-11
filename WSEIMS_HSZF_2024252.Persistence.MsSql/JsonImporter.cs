@@ -5,25 +5,6 @@ using System.IO;
 using System.Text.Json;
 using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
-
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using WSEIMS_HSZF_2024252.Model;
-using WSEIMS_HSZF_2024252.Persistence.MsSql;
-
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using WSEIMS_HSZF_2024252.Model;
-using WSEIMS_HSZF_2024252.Persistence.MsSql;
-
 public class JsonImporter
 {
     // Beolvasás egyetlen JSON fájlból

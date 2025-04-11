@@ -11,7 +11,7 @@ namespace WSEIMS_HSZF_2024252.Model
 
     public class TeamEntity
     {
-        public TeamEntity(string teamName, int year, string headquarters, string teamPrincipal, int constructorsChampionshipWins)
+        /*public TeamEntity(string teamName, int year, string headquarters, string teamPrincipal, int constructorsChampionshipWins)
         {
             Id = Guid.NewGuid().ToString();
             this.teamName = teamName;
@@ -24,11 +24,11 @@ namespace WSEIMS_HSZF_2024252.Model
         public TeamEntity()
         {
             budget = new Budget();
-        }
+        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         [StringLength(100)]
         public string? teamName { get; set; }
         public int year { get; set; }
@@ -37,7 +37,7 @@ namespace WSEIMS_HSZF_2024252.Model
         [StringLength(100)]
         public string? teamPrincipal { get; set; }
         public int constructorsChampionshipWins { get; set; }
-        public virtual Budget budget { get; set; } // módosítva itt
+        public virtual BudgetEntity? budget { get; set; } // módosítva itt
     }
 
 }
