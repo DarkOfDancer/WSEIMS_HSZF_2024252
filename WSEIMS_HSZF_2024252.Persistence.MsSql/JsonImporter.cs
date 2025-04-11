@@ -114,8 +114,8 @@ public class JsonImporter
         using (var context = new FormulaOneDbContext())
         {
             var existingTeam = context.Teams
-                .Include(t => t.Budget)
-                .ThenInclude(b => b.Expenses)
+                .Include(t => t.budget)
+                .ThenInclude(b => b.expenses)
                 .FirstOrDefault(t => t.Id == updatedTeam.Id);
 
             if (existingTeam == null) return false;
@@ -124,19 +124,19 @@ public class JsonImporter
             context.Entry(existingTeam).CurrentValues.SetValues(updatedTeam);
 
             // Frissítjük a költségvetést, ha van
-            if (updatedTeam.Budget != null)
+            if (updatedTeam.budget != null)
             {
-                if (existingTeam.Budget != null)
+                if (existingTeam.budget != null)
                 {
-                    context.Entry(existingTeam.Budget).CurrentValues.SetValues(updatedTeam.Budget);
+                    context.Entry(existingTeam.budget).CurrentValues.SetValues(updatedTeam.budget);
                 }
                 else
                 {
-                    existingTeam.Budget = updatedTeam.Budget;
+                    existingTeam.budget = updatedTeam.budget;
                 }
 
                 // Expenses frissítése (egyszerűsített logika)
-                existingTeam.Budget.Expenses = updatedTeam.Budget.Expenses;
+                existingTeam.budget.expenses = updatedTeam.budget.expenses;
             }
 
             context.SaveChanges();
@@ -145,13 +145,13 @@ public class JsonImporter
     }
 
     // Csapat törlése ID alapján
-    public bool DeleteTeam(int teamId)
+    public bool DeleteTeam(string teamId)
     {
         using (var context = new FormulaOneDbContext())
         {
             var team = context.Teams
-                .Include(t => t.Budget)
-                .ThenInclude(b => b.Expenses)
+                .Include(t => t.budget)
+                .ThenInclude(b => b.expenses)
                 .FirstOrDefault(t => t.Id == teamId);
 
             if (team == null) return false;
