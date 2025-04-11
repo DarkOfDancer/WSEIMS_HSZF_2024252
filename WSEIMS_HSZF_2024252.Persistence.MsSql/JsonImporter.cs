@@ -108,6 +108,86 @@ public class JsonImporter
         // Ellenőrizzük, hogy a mappa neve 4 számjegyből áll (pl. 2023)
         return folderName.Length == 4 && folderName.All(char.IsDigit);
     }
+
+    public bool UpdateTeam(TeamEntity updatedTeam)
+    {
+        using (var context = new FormulaOneDbContext())
+        {
+            var existingTeam = context.Teams
+                .Include(t => t.Budget)
+                .ThenInclude(b => b.Expenses)
+                .FirstOrDefault(t => t.Id == updatedTeam.Id);
+
+            if (existingTeam == null) return false;
+
+            // Frissítjük az értékeket
+            context.Entry(existingTeam).CurrentValues.SetValues(updatedTeam);
+
+            // Frissítjük a költségvetést, ha van
+            if (updatedTeam.Budget != null)
+            {
+                if (existingTeam.Budget != null)
+                {
+                    context.Entry(existingTeam.Budget).CurrentValues.SetValues(updatedTeam.Budget);
+                }
+                else
+                {
+                    existingTeam.Budget = updatedTeam.Budget;
+                }
+
+                // Expenses frissítése (egyszerűsített logika)
+                existingTeam.Budget.Expenses = updatedTeam.Budget.Expenses;
+            }
+
+            context.SaveChanges();
+            return true;
+        }
+    }
+
+    // Csapat törlése ID alapján
+    public bool DeleteTeam(int teamId)
+    {
+        using (var context = new FormulaOneDbContext())
+        {
+            var team = context.Teams
+                .Include(t => t.Budget)
+                .ThenInclude(b => b.Expenses)
+                .FirstOrDefault(t => t.Id == teamId);
+
+            if (team == null) return false;
+
+            context.Teams.Remove(team);
+            context.SaveChanges();
+            return true;
+        }
+    }
+
+    // Egy csapat lekérdezése ID alapján (pl. szerkesztéshez)
+    public TeamEntity GetTeamById(string id)
+    {
+        using (var context = new FormulaOneDbContext())
+        {
+            return context.Teams
+                .Include(t => t.budget)
+                .ThenInclude(b => b.expenses)
+                .FirstOrDefault(t => t.Id == id);
+        }
+    }
+
+    // Összes csapat lekérdezése
+    public List<TeamEntity> GetAllTeams()
+    {
+        using (var context = new FormulaOneDbContext())
+        {
+            return context.Teams
+                .Include(t => t.budget)
+                .ThenInclude(b => b.expenses)
+                .OrderBy(t => t.year)
+                .ThenBy(t => t.teamName)
+                .ToList();
+        }
+    }
+
 }
 
 
