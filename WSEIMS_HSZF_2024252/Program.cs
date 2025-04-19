@@ -27,7 +27,8 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("4. Csapat törlése");
                 Console.WriteLine("5. Fájl importálása");
                 Console.WriteLine("6. Riport készítés");
-                Console.WriteLine("7. Kilépés");
+                Console.WriteLine("7. Kézi riport készítés");
+                Console.WriteLine("8. Kilépés");
                 Console.Write("Válassz egy opciót: ");
 
                 var input = Console.ReadLine();
@@ -53,6 +54,10 @@ namespace WSEIMS_HSZF_2024252
                         Report(service);
                         break;
                     case "7":
+                        HandReport(service);
+                        break;
+                        
+                    case "8":
                         Console.WriteLine("Kilépés...");
                         return;
                     default:
@@ -63,7 +68,7 @@ namespace WSEIMS_HSZF_2024252
             }
         }
 
-        static async Task Report(TeamService service)
+        static void Report(TeamService service)
         {
             Console.Write("Add meg a csapat nevét: ");
             string teamName = Console.ReadLine();
@@ -79,7 +84,41 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("Érvénytelen összeg.");
                 Thread.Sleep(5000);
             }
-            
+            Console.Clear();
+        }
+
+        static void HandReport(TeamService service)
+        {
+            Console.Write("Add meg a csapat nevét: ");
+            string teamName = Console.ReadLine();
+
+            Console.Write("Add meg az évet: ");
+            if (!int.TryParse(Console.ReadLine(), out int year))
+            {
+                Console.WriteLine("Érvénytelen év!");
+                return;
+            }
+
+            var report = service.GetExpenseReportByYearAndTeam(teamName, year);
+
+            if (report.Any())
+            {
+                Console.WriteLine($"\nKöltségvetés jelentés – {teamName} ({year})\n");
+                Console.WriteLine($"{"Kategória",-25} | {"Összeg (USD)",15}");
+                Console.WriteLine(new string('-', 45));
+                foreach (var item in report)
+                {
+                    Console.WriteLine($"{item.Category,-25} | {item.TotalAmount,15:N0}");
+                }
+                Console.WriteLine(new string('-', 45));
+                Console.WriteLine($"{"Összesen",-25} | {report.Sum(x => x.TotalAmount),15:N0}");
+            }
+            else
+            {
+                Console.WriteLine("Nem található költségadat a megadott évre és csapatra.");
+            }
+
+            Console.ReadKey();
         }
         static void ShowTeams(Func<int, int, List<TeamEntity>> dataProvider, ref int page, int size)
         {
@@ -174,7 +213,7 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("Nyomj meg egy gombot a folytatáshoz...");
                 Console.ReadKey();
             }
-            static async Task StartUpload(string rootDirectory,JsonImporter jsonImporter)
+            static void StartUpload(string rootDirectory,JsonImporter jsonImporter)
         {
             // JSON fájlok importálása és eredmény kiírása
             var resultMessage = jsonImporter.ImportTeamsFromJsonDirectory(rootDirectory);
@@ -191,7 +230,7 @@ namespace WSEIMS_HSZF_2024252
             }
             Thread.Sleep(5000);
         }
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var ctx = new FormulaOneDbContext();
             var service = new TeamService();

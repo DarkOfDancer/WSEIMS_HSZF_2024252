@@ -69,8 +69,8 @@ namespace WSEIMS_HSZF_2024252.Application
         {
             var team = _context.Teams
                 .Include(t => t.budget)
-                    .ThenInclude(b => b.expenses)
-                        .ThenInclude(e => e.subcategory)
+                .ThenInclude(b => b.expenses)
+                .ThenInclude(e => e.subcategory)
                 .FirstOrDefault(t => t.Id == id);
 
             if (team == null) return false;
@@ -202,8 +202,29 @@ namespace WSEIMS_HSZF_2024252.Application
             File.WriteAllLines(filePath, reportLines);
 
             Console.WriteLine($"Riport generálva: {filePath}");
-            Thread.Sleep(5000);
+            Thread.Sleep(2000);
         }
+
+        public List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year)
+        {
+            using var context = new FormulaOneDbContext();
+
+            var team = context.Teams
+                .Include(t => t.budget)
+                .ThenInclude(b => b.expenses)
+                .FirstOrDefault(t => t.teamName.ToLower().Contains(teamName.ToLower())
+                                     && t.year == year);
+
+            if (team?.budget?.expenses == null)
+                return new List<(string, double)>();
+
+            return team.budget.expenses
+                .GroupBy(e => e.category)
+                .Select(g => (Category: g.Key, TotalAmount: (double)g.Sum(e => e.amount)))
+                .OrderByDescending(x => x.TotalAmount)
+                .ToList();
+        }
+
     }
 
 }
