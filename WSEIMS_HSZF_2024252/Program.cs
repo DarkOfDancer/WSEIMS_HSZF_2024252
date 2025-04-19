@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Azure;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
@@ -25,7 +26,8 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("3. Csapat frissítése");
                 Console.WriteLine("4. Csapat törlése");
                 Console.WriteLine("5. Fájl importálása");
-                Console.WriteLine("6. Kilépés");
+                Console.WriteLine("6. Riport készítés");
+                Console.WriteLine("7. Kilépés");
                 Console.Write("Válassz egy opciót: ");
 
                 var input = Console.ReadLine();
@@ -33,10 +35,10 @@ namespace WSEIMS_HSZF_2024252
                 switch (input)
                 {
                     case "1":
-                        ShowTeams(service, ref currentPage, 10);
+                        ShowTeams((p, s) => service.GetTeamsPaged(p, s), ref currentPage, 10);
                         break;
                     case "2":
-                        Search(service);
+                        Search(service,ref currentPage,10);
                         break;
                     case "3":
                         Update(service);
@@ -48,6 +50,9 @@ namespace WSEIMS_HSZF_2024252
                         Upload(service);
                         break;
                     case "6":
+                        Report(service);
+                        break;
+                    case "7":
                         Console.WriteLine("Kilépés...");
                         return;
                     default:
@@ -58,12 +63,36 @@ namespace WSEIMS_HSZF_2024252
             }
         }
 
-        static void ShowTeams(TeamService service, ref int page, int size)
+        static async Task Report(TeamService service)
+        {
+            Console.Write("Add meg a csapat nevét: ");
+            string teamName = Console.ReadLine();
+
+            Console.Write("Add meg a tervezett költségvetést (szám): ");
+            if (double.TryParse(Console.ReadLine(), out double budget))
+            {
+                service.GeneratePredictionReport(teamName, budget);
+                Thread.Sleep(5000);
+            }
+            else
+            {
+                Console.WriteLine("Érvénytelen összeg.");
+                Thread.Sleep(5000);
+            }
+            
+        }
+        static void ShowTeams(Func<int, int, List<TeamEntity>> dataProvider, ref int page, int size)
         {
             while (true)
             {
                 Console.Clear();
-                var teams = service.GetTeamsPaged(page, size);
+
+                var teams = dataProvider(page, size);
+                if (teams == null || teams.Count == 0)
+                {
+                    Console.WriteLine("Nincs megjeleníthető csapat.");
+                    break;
+                }
 
                 Console.WriteLine($"--- {page}. oldal ---");
                 foreach (var t in teams)
@@ -74,36 +103,24 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("N - Következő oldal | P - Előző oldal | Q - Vissza");
                 var key = Console.ReadKey(true).Key;
 
-                if (key == ConsoleKey.N)
-                {
-                    if (teams.Count == size) page++; // csak akkor lép előre, ha van elég elem
-                }
-                else if (key == ConsoleKey.P && page > 1)
-                {
-                    page--;
-                }
-                else if (key == ConsoleKey.Q)
-                {
-                    break; // visszatérés a főmenübe
-                }
+                if (key == ConsoleKey.N && teams.Count == size) page++;
+                else if (key == ConsoleKey.P && page > 1) page--;
+                else if (key == ConsoleKey.Q) break;
             }
         }
 
 
-        static void Search(TeamService service)
+        static void Search(TeamService service, ref int currentpage,int size)
         {
             Console.Clear();
             Console.WriteLine("Keresési mező (name, year, hq, principal, titles):");
             var field = Console.ReadLine();
             Console.Write("Keresési érték: ");
             var value = Console.ReadLine();
-            var results = service.Search(field, value);
-            Console.Clear();
-            foreach (var t in results)
-            {
-                Console.WriteLine($"{t.teamName} ({t.year}) - {t.headquarters}");
-            }
-
+            Console.WriteLine("Keresési típus (equals / contains)(e/c):");
+            string type = Console.ReadLine()?.ToLower();
+            var results = service.Search(field, value,type);
+            ShowTeams((p, s) => results.Skip((p - 1) * s).Take(s).ToList(), ref currentpage, size);
             Console.WriteLine("Enter a visszatéréshez...");
             Console.ReadLine();
         }
