@@ -24,7 +24,7 @@ namespace WSEIMS_HSZF_2024252.Application
                 .ToList();
         }
 
-        public List<TeamEntity> Search(string field, string value, bool exact)
+        public List<TeamEntity> Search(string field, string value)
         {
             var query = _context.Teams.AsQueryable();
 
@@ -33,17 +33,17 @@ namespace WSEIMS_HSZF_2024252.Application
             switch (field.ToLower())
             {
                 case "name":
-                    query = exact ? query.Where(t => t.teamName == value) : query.Where(t => t.teamName.Contains(value));
+                    query =  query.Where(t => t.teamName.Contains(value));
                     break;
                 case "year":
                     if (int.TryParse(value, out var year))
                         query = query.Where(t => t.year == year);
                     break;
                 case "hq":
-                    query = exact ? query.Where(t => t.headquarters == value) : query.Where(t => t.headquarters.Contains(value));
+                    query = query.Where(t => t.headquarters.Contains(value));
                     break;
                 case "principal":
-                    query = exact ? query.Where(t => t.teamPrincipal == value) : query.Where(t => t.teamPrincipal.Contains(value));
+                    query = query.Where(t => t.teamPrincipal.Contains(value));
                     break;
                 case "titles":
                     if (int.TryParse(value, out var titles))
@@ -56,13 +56,36 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public bool Delete(string id)
         {
-            var team = _context.Teams.Find(id);
+            var team = _context.Teams
+                .Include(t => t.budget)
+                    .ThenInclude(b => b.expenses)
+                        .ThenInclude(e => e.subcategory)
+                .FirstOrDefault(t => t.Id == id);
+
             if (team == null) return false;
 
+            // Töröljük először a subcategory-ket
+            foreach (var exp in team.budget?.expenses ?? new List<ExpensEntity>())
+            {
+                if (exp.subcategory != null)
+                    _context.Subcategories.RemoveRange(exp.subcategory);
+            }
+
+            // Töröljük az expense-eket
+            _context.Expenses.RemoveRange(team.budget?.expenses ?? new List<ExpensEntity>());
+
+            // Töröljük a budget-et
+            if (team.budget != null)
+                _context.Budgets.Remove(team.budget);
+
+            // Végül töröljük a csapatot
             _context.Teams.Remove(team);
+
             _context.SaveChanges();
             return true;
         }
+
+
 
         public TeamEntity GetById(string id)
         {
@@ -77,6 +100,12 @@ namespace WSEIMS_HSZF_2024252.Application
             _context.Entry(existing).CurrentValues.SetValues(team);
             _context.SaveChanges();
             return true;
+        }
+
+        public List<TeamEntity> ImportFromDirectory(string path)
+        {
+            var importer = new JsonImporter();
+            return importer.ImportTeamsFromNEWDirectory(path);
         }
     }
 

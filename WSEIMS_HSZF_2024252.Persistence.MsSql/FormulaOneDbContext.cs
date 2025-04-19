@@ -29,6 +29,9 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+         
         }
+
     }
 }

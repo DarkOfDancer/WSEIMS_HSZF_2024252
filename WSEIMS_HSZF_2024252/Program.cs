@@ -39,12 +39,15 @@ namespace WSEIMS_HSZF_2024252
                         Search(service);
                         break;
                     case "3":
-                        Delete(service);
-                        break;
-                    case "4":
                         Update(service);
                         break;
+                    case "4":
+                        Delete(service);
+                        break;
                     case "5":
+                        Upload(service);
+                        break;
+                    case "6":
                         Console.WriteLine("Kilépés...");
                         return;
                     default:
@@ -94,9 +97,7 @@ namespace WSEIMS_HSZF_2024252
             var field = Console.ReadLine();
             Console.Write("Keresési érték: ");
             var value = Console.ReadLine();
-            Console.Write("Equals vagy Contains? (e/c): ");
-            var mode = Console.ReadLine()?.ToLower() == "e";
-            var results = service.Search(field, value, mode);
+            var results = service.Search(field, value);
             Console.Clear();
             foreach (var t in results)
             {
@@ -144,7 +145,19 @@ namespace WSEIMS_HSZF_2024252
             Console.ReadLine();
         }
 
-        static async Task StartUpload(string rootDirectory,JsonImporter jsonImporter)
+        static void Upload(TeamService service)
+        {
+           
+                Console.Write("Add meg a könyvtár elérési útját: ");
+                var path = Console.ReadLine();
+
+                var importedTeams = service.ImportFromDirectory(path);
+                Console.WriteLine($"{importedTeams.Count} csapat importálva.");
+
+                Console.WriteLine("Nyomj meg egy gombot a folytatáshoz...");
+                Console.ReadKey();
+            }
+            static async Task StartUpload(string rootDirectory,JsonImporter jsonImporter)
         {
             // JSON fájlok importálása és eredmény kiírása
             var resultMessage = jsonImporter.ImportTeamsFromJsonDirectory(rootDirectory);
