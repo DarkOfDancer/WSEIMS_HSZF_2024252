@@ -17,6 +17,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 
         public FormulaOneDbContext()
         {
+            this.Database.EnsureDeleted();
             this.Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
