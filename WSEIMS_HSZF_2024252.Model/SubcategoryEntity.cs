@@ -11,16 +11,6 @@ namespace WSEIMS_HSZF_2024252.Model
 {
     public class SubcategoryEntity
     {
-        /*public SubcategoryEntity(string name, int amount)
-        {
-            Id = Guid.NewGuid().ToString();
-            this.name = name;
-            this.amount = amount;
-        }
-        public SubcategoryEntity()
-        {
-            Id = Guid.NewGuid().ToString();
-        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

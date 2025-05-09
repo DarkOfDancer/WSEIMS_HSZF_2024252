@@ -11,20 +11,6 @@ namespace WSEIMS_HSZF_2024252.Model
 
     public class TeamEntity
     {
-        /*public TeamEntity(string teamName, int year, string headquarters, string teamPrincipal, int constructorsChampionshipWins)
-        {
-            Id = Guid.NewGuid().ToString();
-            this.teamName = teamName;
-            this.year = year;
-            this.headquarters = headquarters;
-            this.teamPrincipal = teamPrincipal;
-            this.constructorsChampionshipWins = constructorsChampionshipWins;
-            budget = new Budget();
-        }
-        public TeamEntity()
-        {
-            budget = new Budget();
-        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

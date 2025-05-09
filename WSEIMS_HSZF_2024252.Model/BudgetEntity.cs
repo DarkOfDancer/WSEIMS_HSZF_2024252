@@ -10,10 +10,6 @@ namespace WSEIMS_HSZF_2024252.Model
 {
     public class BudgetEntity
     {
-        /*public BudgetEntity()
-        {
-            expenses = new HashSet<Expens>();
-        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

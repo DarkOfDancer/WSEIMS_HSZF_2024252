@@ -10,19 +10,6 @@ namespace WSEIMS_HSZF_2024252.Model
 {
     public class ExpensEntity
     {
-        /*public ExpensEntity(string category, int amount, string approvalStatus, DateTime expenseDate)
-        {
-            Id = Guid.NewGuid().ToString();
-            this.category = category;
-            this.amount = amount;
-            this.approvalStatus = approvalStatus;
-            this.expenseDate =expenseDate;
-            subcategory = new HashSet<Subcategory>();
-        }
-        public ExpensEntity()
-        {
-            subcategory = new HashSet<Subcategory>();
-        }*/
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
