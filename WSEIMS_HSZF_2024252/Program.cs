@@ -2,18 +2,54 @@
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
+using Microsoft.Extensions.Hosting;
 
 
 namespace WSEIMS_HSZF_2024252
 {
     internal class Program
     {
+        var host = Host.CreateDefaultBuilder()
+                 .ConfigureServices((context, services) =>
+                 {
+                     // Adatbázis context
+                     services.AddScoped<FormulaOneDbContext>();
+
+                     // DataProviderek
+                     services.AddSingleton<ITeamDataProvider, TeamDataProvider>();
+                     services.AddSingleton<IBudgetDataProvider, BudgetDataProvider>();
+                     services.AddSingleton<IExpenseDataProvider, ExpenseDataProvider>();
+                     services.AddSingleton<ISubcategoryDataProvider, SubcategoryDataProvider>();
+
+                     // Szervizek
+                     services.AddSingleton<TeamService>();
+
+                     // JSON Import
+                     services.AddSingleton<JsonImporter>();
+                 })
+                 .Build();
+
+        host.Start();
+
+            using IServiceScope scope = host.Services.CreateScope();
+        IServiceProvider services = scope.ServiceProvider;
+
+        // Szolgáltatások lekérése DI-ből
+        var jsonImporter = services.GetRequiredService<JsonImporter>();
+        var teamService = services.GetRequiredService<TeamService>();
+
+        string rootDirectory = @"C:\Users\zsofi\source\repos\WSEIMS_HSZF_2024252\WSEIMS_HSZF_2024252.Model";
+
+        StartUpload(rootDirectory, jsonImporter);
+        Menu(jsonImporter, teamService);
+        }
+
         static void Menu(JsonImporter jsonImporter, TeamService service)
         {
-
             while (true)
             {
                 int currentPage = 1;
@@ -38,7 +74,7 @@ namespace WSEIMS_HSZF_2024252
                         ShowTeams((p, s) => service.GetTeamsPaged(p, s), ref currentPage, 10);
                         break;
                     case "2":
-                        Search(service,ref currentPage,10);
+                        Search(service, ref currentPage, 10);
                         break;
                     case "3":
                         Update(service);
@@ -55,7 +91,6 @@ namespace WSEIMS_HSZF_2024252
                     case "7":
                         HandReport(service);
                         break;
-                        
                     case "8":
                         Console.WriteLine("Kilépés...");
                         return;
@@ -67,6 +102,17 @@ namespace WSEIMS_HSZF_2024252
             }
         }
 
+        static void StartUpload(string rootDirectory, JsonImporter jsonImporter)
+        {
+            var resultMessage = jsonImporter.ImportTeamsFromJsonDirectory(rootDirectory);
+
+            if (resultMessage == null)
+                Console.WriteLine("A könyvtár nem található, vagy egy hiba történt.");
+            else
+                Console.WriteLine($"Sikeresen importálva {resultMessage.Count} csapat.");
+
+            Thread.Sleep(5000);
+        }
         static void Report(TeamService service)
         {
             Console.Write("Add meg a csapat nevét: ");
@@ -163,7 +209,7 @@ namespace WSEIMS_HSZF_2024252
             Console.ReadLine();
         }
 
-        static void Delete(TeamService service)
+        static void Delete(TeamDataProvider service)
         {
             Console.Clear();
             Console.Write("Törlendő ID: ");

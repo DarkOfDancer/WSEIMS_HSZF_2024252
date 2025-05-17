@@ -4,16 +4,32 @@ using System.Collections.Generic;
 using System.Linq;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 using System.Globalization;
+using WSEIMS_HSZF_2024252.Application.WSEIMS_HSZF_2024252.Application;
 
 namespace WSEIMS_HSZF_2024252.Application
 {
-    public class TeamService
+    namespace WSEIMS_HSZF_2024252.Application
+    {
+        public interface ITeamService
+        {
+            List<TeamEntity> GetTeamsPaged(int page, int size);
+            List<TeamEntity> Search(string field, string value, string searchType);
+            bool Delete(string id);
+            TeamEntity GetById(string id);
+            bool Update(TeamEntity team);
+            List<TeamEntity> ImportFromDirectory(string path);
+            void GeneratePredictionReport(string teamName, double plannedBudget);
+            List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year);
+        }
+    }
+
+    public class TeamService : ITeamService
     {
         private readonly FormulaOneDbContext _context;
 
-        public TeamService()
+        public TeamService(FormulaOneDbContext context)
         {
-            _context = new FormulaOneDbContext();
+            _context = context;
         }
 
         public List<TeamEntity> GetTeamsPaged(int page, int size)
@@ -58,7 +74,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
                 case "titles":
                     if (int.TryParse(value, out var titles))
-                        query = query.Where(t => t.constructorsChampionshipWins == titles); 
+                        query = query.Where(t => t.constructorsChampionshipWins == titles);
                     break;
             }
 
@@ -75,28 +91,20 @@ namespace WSEIMS_HSZF_2024252.Application
 
             if (team == null) return false;
 
-            // Töröljük először a subcategory-ket
             foreach (var exp in team.budget?.expenses ?? new List<ExpensEntity>())
             {
                 if (exp.subcategory != null)
                     _context.Subcategories.RemoveRange(exp.subcategory);
             }
 
-            // Töröljük az expense-eket
             _context.Expenses.RemoveRange(team.budget?.expenses ?? new List<ExpensEntity>());
-
-            // Töröljük a budget-et
             if (team.budget != null)
                 _context.Budgets.Remove(team.budget);
 
-            // Végül töröljük a csapatot
             _context.Teams.Remove(team);
-
             _context.SaveChanges();
             return true;
         }
-
-
 
         public TeamEntity GetById(string id)
         {
@@ -121,10 +129,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public void GeneratePredictionReport(string teamName, double plannedBudget)
         {
-            using var context = new FormulaOneDbContext();
-
-            // Utolsó 2 év adatai adott csapathoz
-            var recentBudgets = context.Budgets
+            var recentBudgets = _context.Budgets
                 .Include(b => b.expenses)
                 .Include(b => b.TeamEntity)
                 .Where(b => b.TeamEntity.teamName.ToLower().Contains(teamName.ToLower()))
@@ -132,9 +137,10 @@ namespace WSEIMS_HSZF_2024252.Application
                 .Take(2)
                 .ToList();
 
-            foreach(var data in recentBudgets.Where(p => p.TeamEntity.teamName.ToLower().Contains(teamName.ToLower())))
+            foreach (var data in recentBudgets)
             {
-                teamName = data.TeamEntity.teamName.ToString();
+                if (data.TeamEntity.teamName.ToLower().Contains(teamName.ToLower()))
+                    teamName = data.TeamEntity.teamName;
             }
 
             if (!recentBudgets.Any())
@@ -143,8 +149,7 @@ namespace WSEIMS_HSZF_2024252.Application
                 Thread.Sleep(5000);
                 return;
             }
-            
-            // Csoportosítás kategória szerint
+
             var categories = new[] { "Car", "Personnel", "Operations" };
             var categoryRatios = new Dictionary<string, List<double>>();
 
@@ -161,18 +166,17 @@ namespace WSEIMS_HSZF_2024252.Application
                         .Where(e => e.category.Contains(category, StringComparison.OrdinalIgnoreCase))
                         .Sum(e => e.amount);
 
-                    double ratio = Convert.ToDouble((double)categorySum / (double)total);
+                    double ratio = (double)categorySum / total;
                     categoryRatios[category].Add(ratio);
                 }
             }
 
-            // Riport szöveg összeállítása
             var reportLines = new List<string>
-        {
-            $"Predicted Budget Allocation for: {teamName} ({DateTime.Now.Year + 1})",
-            $"Total Planned Budget: ${plannedBudget.ToString("N0", CultureInfo.InvariantCulture)}",
-            ""
-        };
+            {
+                $"Predicted Budget Allocation for: {teamName} ({DateTime.Now.Year + 1})",
+                $"Total Planned Budget: ${plannedBudget.ToString("N0", CultureInfo.InvariantCulture)}",
+                ""
+            };
 
             foreach (var category in categories)
             {
@@ -191,7 +195,6 @@ namespace WSEIMS_HSZF_2024252.Application
                 reportLines.Add("");
             }
 
-            // Fájlba írás
             var folder = "C:\\Users\\zsofi\\source\\repos\\WSEIMS_HSZF_2024252\\WSEIMS_HSZF_2024252.Model\\Reports";
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
@@ -207,9 +210,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year)
         {
-            using var context = new FormulaOneDbContext();
-
-            var team = context.Teams
+            var team = _context.Teams
                 .Include(t => t.budget)
                 .ThenInclude(b => b.expenses)
                 .FirstOrDefault(t => t.teamName.ToLower().Contains(teamName.ToLower())
@@ -220,8 +221,8 @@ namespace WSEIMS_HSZF_2024252.Application
 
             return team.budget.expenses
                 .GroupBy(e => e.category)
-                .Select(g => (Category: g.Key, TotalAmount: (double)g.Sum(e => e.amount)))
-                .OrderByDescending(x => x.TotalAmount)
+                .Select(g => (g.Key, (double)g.Sum(e => e.amount)))
+                .OrderByDescending(x => x.Item2)
                 .ToList();
         }
 
