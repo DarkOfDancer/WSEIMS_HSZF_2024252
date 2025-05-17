@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 using Microsoft.Extensions.Hosting;
+using WSEIMS_HSZF_2024252.Application;
+using WSEIMS_HSZF_2024252.Application;
 
 
 namespace WSEIMS_HSZF_2024252
 {
     internal class Program
     {
-        var host = Host.CreateDefaultBuilder()
+        static void Main(string[] args) 
+        {
+            var host = Host.CreateDefaultBuilder()
                  .ConfigureServices((context, services) =>
                  {
                      // Adatbázis context
@@ -26,29 +30,32 @@ namespace WSEIMS_HSZF_2024252
                      services.AddSingleton<ISubcategoryDataProvider, SubcategoryDataProvider>();
 
                      // Szervizek
-                     services.AddSingleton<TeamService>();
+                     services.AddSingleton<ITeamService, TeamService>();
+                     services.AddSingleton<IBudgetReportService, BudgetReportService>();
 
                      // JSON Import
                      services.AddSingleton<JsonImporter>();
                  })
                  .Build();
 
-        host.Start();
+            host.Start();
 
             using IServiceScope scope = host.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
+            IServiceProvider services = scope.ServiceProvider;
 
-        // Szolgáltatások lekérése DI-ből
-        var jsonImporter = services.GetRequiredService<JsonImporter>();
-        var teamService = services.GetRequiredService<TeamService>();
+            // Szolgáltatások lekérése DI-ből
+            var jsonImporter = host.Services.GetRequiredService<JsonImporter>();
+            var teamService = host.Services.GetRequiredService<ITeamService>();
+            var reportService = host.Services.GetRequiredService<IBudgetReportService>();
 
-        string rootDirectory = @"C:\Users\zsofi\source\repos\WSEIMS_HSZF_2024252\WSEIMS_HSZF_2024252.Model";
+            string rootDirectory = @"C:\Users\zsofi\source\repos\WSEIMS_HSZF_2024252\WSEIMS_HSZF_2024252.Model";
 
-        StartUpload(rootDirectory, jsonImporter);
-        Menu(jsonImporter, teamService);
+            StartUpload(rootDirectory, jsonImporter);
+            Menu(jsonImporter, teamService, reportService);
         }
+        
 
-        static void Menu(JsonImporter jsonImporter, TeamService service)
+        static void Menu(JsonImporter jsonImporter, ITeamService service, IBudgetReportService bservice)
         {
             while (true)
             {
@@ -86,10 +93,10 @@ namespace WSEIMS_HSZF_2024252
                         Upload(service);
                         break;
                     case "6":
-                        Report(service);
+                        Report(bservice);
                         break;
                     case "7":
-                        HandReport(service);
+                        HandReport(bservice);
                         break;
                     case "8":
                         Console.WriteLine("Kilépés...");
@@ -113,7 +120,7 @@ namespace WSEIMS_HSZF_2024252
 
             Thread.Sleep(5000);
         }
-        static void Report(TeamService service)
+        static void Report(IBudgetReportService service)
         {
             Console.Write("Add meg a csapat nevét: ");
             string teamName = Console.ReadLine();
@@ -132,7 +139,7 @@ namespace WSEIMS_HSZF_2024252
             Console.Clear();
         }
 
-        static void HandReport(TeamService service)
+        static void HandReport(IBudgetReportService service)
         {
             Console.Write("Add meg a csapat nevét: ");
             string teamName = Console.ReadLine();
@@ -194,7 +201,7 @@ namespace WSEIMS_HSZF_2024252
         }
 
 
-        static void Search(TeamService service, ref int currentpage,int size)
+        static void Search(ITeamService service, ref int currentpage,int size)
         {
             Console.Clear();
             Console.WriteLine("Keresési mező (name, year, hq, principal, titles):");
@@ -209,7 +216,7 @@ namespace WSEIMS_HSZF_2024252
             Console.ReadLine();
         }
 
-        static void Delete(TeamDataProvider service)
+        static void Delete(ITeamService service)
         {
             Console.Clear();
             Console.Write("Törlendő ID: ");
@@ -219,7 +226,7 @@ namespace WSEIMS_HSZF_2024252
             Console.ReadLine();
         }
 
-        static void Update(TeamService service)
+        static void Update(ITeamService service)
         {
             Console.Clear();
             Console.Write("Frissítendő ID: ");
@@ -246,7 +253,7 @@ namespace WSEIMS_HSZF_2024252
             Console.ReadLine();
         }
 
-        static void Upload(TeamService service)
+        static void Upload(ITeamService service)
         {
            
                 Console.Write("Add meg a könyvtár elérési útját: ");
@@ -258,35 +265,5 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("Nyomj meg egy gombot a folytatáshoz...");
                 Console.ReadKey();
             }
-            static void StartUpload(string rootDirectory,JsonImporter jsonImporter)
-        {
-            // JSON fájlok importálása és eredmény kiírása
-            var resultMessage = jsonImporter.ImportTeamsFromJsonDirectory(rootDirectory);
-
-            // Az importálás eredményének kiírása
-
-            if (resultMessage == null)
-            {
-                Console.WriteLine("A könyvtár nem található, vagy egy hiba történt.");
-            }
-            else
-            {
-                Console.WriteLine($"Sikeresen importálva {resultMessage.Count} csapat.");
-            }
-            Thread.Sleep(5000);
-        }
-        static void Main(string[] args)
-        {
-            var ctx = new FormulaOneDbContext();
-            var service = new TeamService();
-            // Az importáló osztály példányosítása
-            var jsonImporter = new JsonImporter();
-            // A gyökér könyvtár
-            string rootDirectory = @"C:\Users\zsofi\source\repos\WSEIMS_HSZF_2024252\WSEIMS_HSZF_2024252.Model";  
-            
-            StartUpload(rootDirectory,jsonImporter);
-            Menu(jsonImporter,service);
-            
-        }
     }
 }

@@ -1,15 +1,15 @@
 Predicted Budget Allocation for: AMG Mercedes (2026)
-Total Planned Budget: $1,000,000,000
+Total Planned Budget: $602,111,000
 
 Car:
-  Minimum: $344,827,586
-  Maximum: $386,666,667
+  Minimum: $207,624,483
+  Maximum: $232,816,253
 
 Personnel:
-  Minimum: $413,333,333
-  Maximum: $413,793,103
+  Minimum: $248,872,547
+  Maximum: $249,149,379
 
 Operations:
-  Minimum: $200,000,000
-  Maximum: $241,379,310
+  Minimum: $120,422,200
+  Maximum: $145,337,138
 

@@ -64,8 +64,9 @@ public class JsonImporter
                     if (existingTeam == null)
                     {
                         context.Teams.Add(team);
-                        context.SaveChanges();
                         allTeams.Add(team);
+                        context.SaveChanges();
+    
                     }
                     else
                     {
@@ -87,8 +88,10 @@ public class JsonImporter
                                 }
                             }
 
-                            context.SaveChanges();
+                            
                             allTeams.Add(existingTeam);
+                            context.SaveChanges();
+
                         }
                     }
                 }
@@ -117,6 +120,7 @@ public class JsonImporter
 
             using (var context = new FormulaOneDbContext())
             {
+          
                 // Ellenőrizzük, hogy létezik-e már a csapat a megfelelő évvel
                 var existingTeam = context.Teams
                     .Include(t => t.budget)
@@ -125,6 +129,7 @@ public class JsonImporter
 
                 if (existingTeam == null)
                 {
+     
                     // Ha nem létezik, új csapatot adunk hozzá
                     context.Teams.Add(team);
                     context.SaveChanges();
@@ -132,6 +137,7 @@ public class JsonImporter
                 }
                 else
                 {
+
                     // Ha létezik, hozzáadjuk az új költségeket, ha nem léteznek már
                     if (team.budget?.expenses != null && team.budget.expenses.Any())
                     {
