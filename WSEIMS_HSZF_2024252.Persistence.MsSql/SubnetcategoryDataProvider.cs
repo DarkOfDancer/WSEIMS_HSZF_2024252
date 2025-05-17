@@ -6,7 +6,6 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 {
     public interface ISubcategoryDataProvider
     {
-        SubcategoryEntity? GetSubcategoryByNameAndAmount(string name, int amount);
         void AddSubcategory(SubcategoryEntity subcategory);
     }
 
@@ -19,10 +18,6 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             this.ctx = ctx;
         }
 
-        public SubcategoryEntity? GetSubcategoryByNameAndAmount(string name, int amount)
-        {
-            return ctx.Subcategories.FirstOrDefault(s => s.name == name && s.amount == amount);
-        }
 
         public void AddSubcategory(SubcategoryEntity subcategory)
         {

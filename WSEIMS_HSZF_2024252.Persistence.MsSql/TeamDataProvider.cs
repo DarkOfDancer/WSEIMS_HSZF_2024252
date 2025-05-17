@@ -6,7 +6,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 {
     public interface ITeamDataProvider
     {
-        TeamEntity? GetTeamByNameAndYear(string teamName, int year);
+
         void AddTeam(TeamEntity team);
     }
 
@@ -19,10 +19,6 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             this.ctx = ctx;
         }
 
-        public TeamEntity? GetTeamByNameAndYear(string teamName, int year)
-        {
-            return ctx.Teams.FirstOrDefault(t => t.teamName == teamName && t.year == year);
-        }
 
         public void AddTeam(TeamEntity team)
         {
