@@ -8,8 +8,6 @@ using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 using Microsoft.Extensions.Hosting;
 using WSEIMS_HSZF_2024252.Application;
-using WSEIMS_HSZF_2024252.Application;
-
 
 namespace WSEIMS_HSZF_2024252
 {
