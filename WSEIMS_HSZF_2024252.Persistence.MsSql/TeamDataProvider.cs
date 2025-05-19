@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using WSEIMS_HSZF_2024252.Model;
 
@@ -7,12 +7,12 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
     public interface ITeamDataProvider
     {
 
-        void AddTeam(TeamEntity team);
+        FormulaOneDbContext Context();
     }
 
     public class TeamDataProvider : ITeamDataProvider
     {
-        private readonly FormulaOneDbContext ctx;
+        public readonly FormulaOneDbContext ctx;
 
         public TeamDataProvider(FormulaOneDbContext ctx)
         {
@@ -20,10 +20,9 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
         }
 
 
-        public void AddTeam(TeamEntity team)
+        public FormulaOneDbContext Context()
         {
-            ctx.Teams.Add(team);
-            ctx.SaveChanges(); // Az adatbázisba mentés itt történik meg
+            return ctx; 
         }
     }
 }
