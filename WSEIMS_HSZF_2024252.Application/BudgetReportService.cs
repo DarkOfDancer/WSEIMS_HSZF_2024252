@@ -16,16 +16,16 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
     }
     public class BudgetReportService : IBudgetReportService
     {
-        private readonly FormulaOneDbContext _context;
+        private readonly ITeamDataProvider _context;
 
-        public BudgetReportService(FormulaOneDbContext context)
+        public BudgetReportService(ITeamDataProvider context)
         {
             _context = context;
         }
 
         public void GeneratePredictionReport(string teamName, double plannedBudget)
         {
-            var recentBudgets = _context.Budgets
+            var recentBudgets = _context.Context().Budgets
                 .Include(b => b.expenses)
                 .Include(b => b.TeamEntity)
                 .Where(b => b.TeamEntity.teamName.ToLower().Contains(teamName.ToLower()))
@@ -106,7 +106,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 
         public List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year)
         {
-            var team = _context.Teams
+            var team = _context.Context().Teams
                 .Include(t => t.budget)
                 .ThenInclude(b => b.expenses)
                 .FirstOrDefault(t => t.teamName.ToLower().Contains(teamName.ToLower())

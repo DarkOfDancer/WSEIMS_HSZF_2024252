@@ -13,17 +13,15 @@ namespace WSEIMS_HSZF_2024252.Tests
     [TestFixture]
     public class TeamServiceTests
     {
-        private Mock<ITeamService> _teamServiceMock;
+        private Mock<ITeamDataProvider> _teamServiceMock;
 
         private TeamService _teamService;
 
         [SetUp]
         public void Setup()
         {
-            _teamServiceMock = new Mock<ITeamService>();
-            FormulaOneDbContext dbContext = new FormulaOneDbContext();
-            TeamDataProvider db = new TeamDataProvider(dbContext);
-            _teamService = new TeamService(db);
+            _teamServiceMock = new Mock<ITeamDataProvider>();
+            _teamService = new TeamService(_teamServiceMock.Object);
         }
 
         [Test]
@@ -39,6 +37,7 @@ namespace WSEIMS_HSZF_2024252.Tests
             Assert.That(result != null);
             Assert.That(expectedTEAM.Id == result.Id);
         }
+
         [Test]
         public void GetTeamById_ReturnsNull_WhenTeamDoesNotExists()
         {

@@ -1,0 +1,15 @@
+Predicted Budget Allocation for: Scuderia Ferrari (2026)
+Total Planned Budget: $1,201,312,312
+
+Car:
+  Minimum: $397,675,800
+  Maximum: $465,024,121
+
+Personnel:
+  Minimum: $503,776,131
+  Maximum: $513,664,575
+
+Operations:
+  Minimum: $232,512,060
+  Maximum: $289,971,937
+
