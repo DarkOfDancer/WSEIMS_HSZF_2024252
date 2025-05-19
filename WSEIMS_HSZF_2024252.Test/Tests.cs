@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,8 @@ namespace WSEIMS_HSZF_2024252.Tests
         public void Setup()
         {
             _teamServiceMock = new Mock<ITeamService>();
-            FormulaOneDbContext db = new FormulaOneDbContext();
+            FormulaOneDbContext dbContext = new FormulaOneDbContext();
+            TeamDataProvider db = new TeamDataProvider(dbContext);
             _teamService = new TeamService(db);
         }
 
