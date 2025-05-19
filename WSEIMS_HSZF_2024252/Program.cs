@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
@@ -25,9 +25,6 @@ namespace WSEIMS_HSZF_2024252
 
                      // DataProviderek
                      services.AddSingleton<ITeamDataProvider, TeamDataProvider>();
-                     services.AddSingleton<IBudgetDataProvider, BudgetDataProvider>();
-                     services.AddSingleton<IExpenseDataProvider, ExpenseDataProvider>();
-                     services.AddSingleton<ISubcategoryDataProvider, SubcategoryDataProvider>();
 
                      // Szervizek
                      services.AddSingleton<ITeamService, TeamService>();
