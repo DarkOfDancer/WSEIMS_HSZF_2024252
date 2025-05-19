@@ -90,8 +90,8 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
                 reportLines.Add($"  Maximum: ${maxValue.ToString("N0", CultureInfo.InvariantCulture)}");
                 reportLines.Add("");
             }
-
-            var folder = "C:\\Users\\zsofi\\source\\repos\\WSEIMS_HSZF_2024252\\WSEIMS_HSZF_2024252.Model\\Reports";
+            string relativePath = @"..\..\..\..\WSEIMS_HSZF_2024252.Model\\Reports";
+            string folder = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
