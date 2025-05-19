@@ -1,4 +1,4 @@
-﻿using WSEIMS_HSZF_2024252.Model;
+using WSEIMS_HSZF_2024252.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +20,16 @@ namespace WSEIMS_HSZF_2024252.Application
         }
     public class TeamService : ITeamService
     {
-        private readonly FormulaOneDbContext _context;
+        private readonly ITeamDataProvider _context;
 
-        public TeamService(FormulaOneDbContext context)
+        public TeamService(ITeamDataProvider context)
         {
             _context = context;
         }
 
         public List<TeamEntity> GetTeamsPaged(int page, int size)
         {
-            return _context.Teams
+            return _context.Context().Teams
                 .OrderBy(t => t.year)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -38,7 +38,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public List<TeamEntity> Search(string field, string value, string searchType)
         {
-            var query = _context.Teams.AsQueryable();
+            var query = _context.Context().Teams.AsQueryable();
 
             if (string.IsNullOrEmpty(value)) return new List<TeamEntity>();
 
@@ -78,7 +78,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public bool Delete(string id)
         {
-            var team = _context.Teams
+            var team = _context.Context().Teams
                 .Include(t => t.budget)
                 .ThenInclude(b => b.expenses)
                 .ThenInclude(e => e.subcategory)
@@ -89,30 +89,30 @@ namespace WSEIMS_HSZF_2024252.Application
             foreach (var exp in team.budget?.expenses ?? new List<ExpensEntity>())
             {
                 if (exp.subcategory != null)
-                    _context.Subcategories.RemoveRange(exp.subcategory);
+                    _context.Context().Subcategories.RemoveRange(exp.subcategory);
             }
 
-            _context.Expenses.RemoveRange(team.budget?.expenses ?? new List<ExpensEntity>());
+            _context.Context().Expenses.RemoveRange(team.budget?.expenses ?? new List<ExpensEntity>());
             if (team.budget != null)
-                _context.Budgets.Remove(team.budget);
+                _context.Context().Remove(team.budget);
 
-            _context.Teams.Remove(team);
-            _context.SaveChanges();
+            _context.Context().Remove(team);
+            _context.Context().SaveChanges();
             return true;
         }
 
         public TeamEntity GetById(string id)
         {
-            return _context.Teams.FirstOrDefault(t => t.Id == id);
+            return _context.Context().Teams.FirstOrDefault(t => t.Id == id);
         }
 
         public bool Update(TeamEntity team)
         {
-            var existing = _context.Teams.Find(team.Id);
+            var existing = _context.Context().Teams.Find(team.Id);
             if (existing == null) return false;
 
-            _context.Entry(existing).CurrentValues.SetValues(team);
-            _context.SaveChanges();
+            _context.Context().Entry(existing).CurrentValues.SetValues(team);
+            _context.Context().SaveChanges();
             return true;
         }
 
