@@ -48,7 +48,8 @@ namespace WSEIMS_HSZF_2024252
             var teamService = host.Services.GetRequiredService<ITeamService>();
             var reportService = host.Services.GetRequiredService<IBudgetReportService>();
 
-            string rootDirectory = @"C:\Users\zsofi\source\repos\WSEIMS_HSZF_2024252\WSEIMS_HSZF_2024252.Model";
+            string relativePath = @"..\..\..\..\WSEIMS_HSZF_2024252.Model";
+            string rootDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
 
             StartUpload(rootDirectory, jsonImporter);
             Menu(jsonImporter, teamService, reportService);
