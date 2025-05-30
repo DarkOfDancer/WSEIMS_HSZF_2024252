@@ -38,8 +38,7 @@ namespace WSEIMS_HSZF_2024252.Application
         }
         public List<TeamEntity> Search(string field, string value, string searchType)
         {
-            var teams = dp.GetAll();
-
+            var teams = dp.GetAll() ?? new List<TeamEntity>();
             if (string.IsNullOrEmpty(value))
                 return new List<TeamEntity>();
 
@@ -93,7 +92,6 @@ namespace WSEIMS_HSZF_2024252.Application
             var existing = dp.GetById(team.Id);
             if (existing == null) return false;
 
-            // Itt lehetne további validáció/üzleti logika is
             return dp.Update(team);
         }
 

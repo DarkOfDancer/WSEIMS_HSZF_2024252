@@ -22,11 +22,13 @@ namespace WSEIMS_HSZF_2024252
                      services.AddScoped<FormulaOneDbContext>();
 
                      // DataProviderek
+                     services.AddScoped<IBudgetDataProvider, BudgetDataProvider>();
                      services.AddSingleton<ITeamDataProvider, TeamDataProvider>();
 
                      // Szervizek
                      services.AddSingleton<ITeamService, TeamService>();
                      services.AddSingleton<IBudgetReportService, BudgetReportService>();
+                     services.AddScoped<IBudgetService, BudgetService>();
 
                      // JSON Import
                      services.AddSingleton<JsonImporter>();

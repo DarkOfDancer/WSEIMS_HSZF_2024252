@@ -7,7 +7,6 @@ using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 using Moq;
 
-
 namespace WSEIMS_HSZF_2024252.Tests
 {
     [TestFixture]
@@ -47,91 +46,163 @@ namespace WSEIMS_HSZF_2024252.Tests
             Assert.That(result == null);
         }
         [Test]
-        public void SearchTeam_ReturnList_WhenTeamExist_Contains()
+        public void Search_ReturnList_WhenTeamsExist_Contains()
         {
-            var field ="name";
-            var value = "Ferrari";
+            // Arrange
+            var field = "name";
+            var value = "ferrari";
             var searchType = "c";
 
-            List<TeamEntity> expected = new List<TeamEntity> { new TeamEntity { teamName = "Scuda Ferrari" }, new TeamEntity { teamName="Scuda Ferrari"} };
+            var teamsInDb = new List<TeamEntity>
+    {
+        new TeamEntity { teamName = "Scuderia Ferrari" },
+        new TeamEntity { teamName = "Red Bull Racing" },
+        new TeamEntity { teamName = "BWT Mercedes" }
+    };
 
-            _teamServiceMock.Setup(p => p.Search(field, value, searchType)).Returns(expected);
+            _teamServiceMock.Setup(dp => dp.GetAll()).Returns(teamsInDb);
 
+            // Act
             var result = _teamService.Search(field, value, searchType);
 
-            Assert.That(result == expected);
+            // Assert
+            Assert.That(result.Any(t => t.teamName?.ToLower().Contains(value) == true), Is.True);
         }
+
         [Test]
-        public void SearchTeam_ReturnNull_WhenTeamDoesNotExist_Contains()
+        public void Search_ReturnEmpty_WhenTeamsDoesNotExist_Contains()
         {
             var field = "name";
             var value = "Ferrari";
-            var searchType = "c";
+            var searchType = "c"; 
 
-            _teamServiceMock.Setup(p => p.Search(field, value, searchType)).Returns((List<TeamEntity>)null);
+            _teamServiceMock.Setup(dp => dp.GetAll()).Returns((List<TeamEntity>)null);
+
             var result = _teamService.Search(field, value, searchType);
-            Assert.That(result == null);
+      
+            Assert.That(result.Count==0);   
         }
         [Test]
-        public void SearchTeam_ReturnList_WhenTeamExist_Equals()
+        public void Search_ReturnList_WhenTeamsExist_Equals()
         {
             var field = "name";
-            var value = "AMG Mercedes";
+            var value = "Scuderia Ferrari";
             var searchType = "e";
 
-            List<TeamEntity> expected = new List<TeamEntity> { new TeamEntity { teamName = "Scuda Ferrari" }, new TeamEntity { teamName = "Scuda Ferrari" } };
+            var teamsInDb = new List<TeamEntity>
+    {
+        new TeamEntity { teamName = "Scuderia Ferrari" },
+        new TeamEntity { teamName = "Red Bull Racing" },
+        new TeamEntity { teamName = "BWT Mercedes" }
+    };
 
-            _teamServiceMock.Setup(p => p.Search(field, value, searchType)).Returns(expected);
+            _teamServiceMock.Setup(dp => dp.GetAll()).Returns(teamsInDb);
 
             var result = _teamService.Search(field, value, searchType);
 
-            Assert.That(result == expected);
+            Assert.That(result.Any(t => t.teamName.Equals(value))==true);
         }
         [Test]
-        public void SearchTeam_ReturnNull_WhenTeamDoesNotExist_Equals()
+        public void Search_ReturnEmpty_WhenTeamsDoesNotExist_Equals()
         {
             var field = "name";
-            var value = "AMG Mercedes";
+            var value = "Scuderia Ferrari";
             var searchType = "e";
 
-            _teamServiceMock.Setup(p => p.Search(field, value, searchType)).Returns((List<TeamEntity>)null);
+
+            _teamServiceMock.Setup(dp => dp.GetAll()).Returns((List<TeamEntity>)null);
+
             var result = _teamService.Search(field, value, searchType);
-            Assert.That(result == null);
+
+            Assert.That(result.Count==0);
         }
 
         [Test]
         public void UpdateWhenTeamExist()
         {
-            
-            var team = new TeamEntity{teamName="test teamname",teamPrincipal="test principal", headquarters="test headquarters",constructorsChampionshipWins=1,year=2025};
-            _teamServiceMock.Setup(p => p.Update(team)).Returns(true);
-            var result = _teamService.Update(team);
-            Assert.That(result == true);
-        }
-        [Test]
-        public void UpdateWhenTeamDoesNotExist()
-        {
+            var teamId = "team123";
+            var team = new TeamEntity
+            {
+                Id = teamId,
+                teamName = "test teamname",
+                teamPrincipal = "test principal",
+                headquarters = "test headquarters",
+                constructorsChampionshipWins = 1,
+                year = 2025
+            };
 
-            _teamServiceMock.Setup(p => p.Update((TeamEntity)null)).Returns(false);
-            var result = _teamService.Update((TeamEntity)null);
-            Assert.That(result == false);
+            _teamServiceMock.Setup(dp => dp.GetById(teamId)).Returns(team);
+
+            _teamServiceMock.Setup(dp => dp.Update(It.Is<TeamEntity>(t => t.Id == teamId))).Returns(true);
+
+            var result = _teamService.Update(team);
+
+            Assert.That(result==true);
         }
         [Test]
-        public void DeleteWhenTeamExist()
+        public void UpdateWhenTeamDoesNotExist_ReturnsFalse()
         {
-            var id = "testid";
-            var team = new TeamEntity {Id=id, teamName = "test teamname", teamPrincipal = "test principal", headquarters = "test headquarters", constructorsChampionshipWins = 1, year = 2025 };
-            _teamServiceMock.Setup(p => p.Delete(id)).Returns(true);
-            var result = _teamService.Delete(id);
-            Assert.That(result == true);
+            var teamId = "nonexistentId";
+            var team = new TeamEntity
+            {
+                Id = teamId,
+                teamName = "Nonexistent Team",
+                teamPrincipal = "No Principal",
+                headquarters = "Nowhere",
+                constructorsChampionshipWins = 0,
+                year = 2025
+            };
+
+            _teamServiceMock.Setup(dp => dp.GetById(teamId)).Returns((TeamEntity)null);
+
+            var result = _teamService.Update(team);
+
+            Assert.That(result==false);
+        }
+        [Test]
+        public void DeleteWhenTeamExists()
+        {
+            // Arrange
+            var teamId = "test-team-id";
+
+            var dummyTeam = new TeamEntity
+            {
+                Id = teamId,
+                teamName = "Test Team",
+                budget = new BudgetEntity
+                {
+                    expenses = new List<ExpensEntity>
+            {
+                new ExpensEntity
+                {
+                    subcategory = new List<SubcategoryEntity>
+                    {
+                        new SubcategoryEntity { Id = "sub1", name = "Sub1" }
+                    }
+                }
+            }
+                }
+            };
+
+            _teamServiceMock.Setup(dp => dp.GetById(teamId)).Returns(dummyTeam);
+            _teamServiceMock.Setup(dp => dp.Delete(teamId)).Returns(true);
+
+            // Act
+            var result = _teamService.Delete(teamId);
+
+            // Assert
+            Assert.That(result==true);
         }
         [Test]
         public void DeleteWhenTeamDoesNotExist()
         {
+            var teamId = "non-existent-id";
 
-            _teamServiceMock.Setup(p => p.Delete(null)).Returns(false);
-            var result = _teamService.Delete(null);
-            Assert.That(result == false);
+            _teamServiceMock.Setup(dp => dp.GetById(teamId)).Returns((TeamEntity)null);
+
+            var result = _teamService.Delete(teamId);
+
+            Assert.That(result==false);
         }
     }
 }
