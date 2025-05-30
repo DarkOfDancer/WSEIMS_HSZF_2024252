@@ -8,7 +8,7 @@
     "totalBudget": 140000000,
     "expenses": [
       {
-        "category": "Car Development",
+        "category": "NewExpense1",
         "amount": 48000000,
         "approvalStatus": "Approved",
         "expenseDate": "2023-01-14",
@@ -19,25 +19,43 @@
         ]
       },
       {
-        "category": "Personnel",
+        "category": "NewExpense2",
         "amount": 58000000,
         "approvalStatus": "Pending",
         "expenseDate": "2023-02-03",
         "subcategory": [
-          { "name": "Driver", "amount": 24000000 },
-          { "name": "Engineer", "amount": 19000000 },
-          { "name": "Pit Crew", "amount": 15000000 }
+          {
+            "name": "Driver",
+            "amount": 24000000
+          },
+          {
+            "name": "Engineer",
+            "amount": 19000000
+          },
+          {
+            "name": "Pit Crew",
+            "amount": 15000000
+          }
         ]
       },
       {
-        "category": "Operations",
+        "category": "NewExpense3",
         "amount": 34000000,
         "approvalStatus": "Approved",
         "expenseDate": "2023-03-09",
         "subcategory": [
-          { "name": "Logistics", "amount": 14000000 },
-          { "name": "Marketing", "amount": 10000000 },
-          { "name": "Travel", "amount": 10000000 }
+          {
+            "name": "Logistics",
+            "amount": 14000000
+          },
+          {
+            "name": "Marketing",
+            "amount": 10000000
+          },
+          {
+            "name": "Travel",
+            "amount": 10000000
+          }
         ]
       }
     ]

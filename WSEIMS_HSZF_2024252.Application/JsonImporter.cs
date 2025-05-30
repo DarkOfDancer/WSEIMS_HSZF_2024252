@@ -12,6 +12,12 @@ public class JsonImporter
     private readonly ITeamDataProvider dp;
     private readonly IBudgetDataProvider bp;
 
+    public JsonImporter(ITeamDataProvider dp)
+    {
+        this.dp = dp;
+       
+    }
+
     public JsonImporter(ITeamDataProvider dp, IBudgetDataProvider bp)
     {
         this.dp = dp;
@@ -123,11 +129,11 @@ public class JsonImporter
 
                         if (!isDuplicate)
                         {
-                            existingTeam.budget.expenses.Add(newExpense);
+                            dp.Context().Expenses.Add(newExpense);
                         }
                     }
 
-                    bp.Update(existingTeam.budget);
+                    dp.Context().SaveChanges(); 
                     allTeams.Add(existingTeam);
                 }
             }

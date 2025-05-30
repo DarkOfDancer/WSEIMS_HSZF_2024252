@@ -23,7 +23,7 @@ namespace WSEIMS_HSZF_2024252.Model
         [StringLength(100)]
         public string? teamPrincipal { get; set; }
         public int constructorsChampionshipWins { get; set; }
-        public virtual BudgetEntity? budget { get; set; } // módosítva itt
+        public virtual BudgetEntity? budget { get; set; } 
     }
 
 }
