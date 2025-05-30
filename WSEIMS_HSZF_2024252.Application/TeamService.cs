@@ -27,17 +27,59 @@ namespace WSEIMS_HSZF_2024252.Application
             this.dp = dp;
         }
 
-       public List<TeamEntity> GetTeamsPaged(int page, int size)
+        public List<TeamEntity> GetTeamsPaged(int page, int size)
         {
-            return dp.GetTeamsPaged(page, size);
+            var teams = dp.GetAll();
+            return teams
+                .OrderBy(t => t.year)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToList();
         }
         public List<TeamEntity> Search(string field, string value, string searchType)
         {
-           return dp.Search(field, value, searchType);
-        }
+            var teams = dp.GetAll();
 
+            if (string.IsNullOrEmpty(value))
+                return new List<TeamEntity>();
+
+            value = value.ToLower();
+
+            switch (field.ToLower())
+            {
+                case "name":
+                    return searchType == "e"
+                        ? teams.Where(t => t.teamName?.ToLower() == value).ToList()
+                        : teams.Where(t => t.teamName?.ToLower().Contains(value) == true).ToList();
+
+                case "year":
+                    if (int.TryParse(value, out var year))
+                        return teams.Where(t => t.year == year).ToList();
+                    break;
+
+                case "hq":
+                    return searchType == "e"
+                        ? teams.Where(t => t.headquarters?.ToLower() == value).ToList()
+                        : teams.Where(t => t.headquarters?.ToLower().Contains(value) == true).ToList();
+
+                case "principal":
+                    return searchType == "e"
+                        ? teams.Where(t => t.teamPrincipal?.ToLower() == value).ToList()
+                        : teams.Where(t => t.teamPrincipal?.ToLower().Contains(value) == true).ToList();
+
+                case "titles":
+                    if (int.TryParse(value, out var titles))
+                        return teams.Where(t => t.constructorsChampionshipWins == titles).ToList();
+                    break;
+            }
+
+            return new List<TeamEntity>();
+        }
         public bool Delete(string id)
         {
+            var team = dp.GetById(id);
+            if (team == null) return false;
+
             return dp.Delete(id);
         }
 
@@ -48,13 +90,23 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public bool Update(TeamEntity team)
         {
+            var existing = dp.GetById(team.Id);
+            if (existing == null) return false;
+
+            // Itt lehetne további validáció/üzleti logika is
             return dp.Update(team);
         }
 
         public List<TeamEntity> ImportFromDirectory(string path)
         {
             var importer = new JsonImporter();
-            return importer.ImportTeamsFromNEWDirectory(path);
+            var importedTeams = importer.ImportTeamsFromNEWDirectory(path);
+            foreach (var team in importedTeams)
+            {
+                dp.Save(team);
+            }
+
+            return importedTeams;
         }
 
 

@@ -7,6 +7,11 @@ using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
 public class JsonImporter
 {
+    private readonly ITeamDataProvider dp;
+    public JsonImporter(ITeamDataProvider dp)
+    {
+        this.dp = dp;
+    }
     // Beolvasás egyetlen JSON fájlból
     public TeamEntity ReadJsonFile(string filePath)
     {
@@ -54,18 +59,17 @@ public class JsonImporter
                 var team = ReadJsonFile(filePath);
                 if (team == null) continue;
 
-                using (var context = new FormulaOneDbContext())
-                {
-                    var existingTeam = context.Teams
+
+                    var existingTeam =dp.Context().Teams
                         .Include(t => t.budget)
                         .ThenInclude(b => b.expenses)
                         .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
 
                     if (existingTeam == null)
                     {
-                        context.Teams.Add(team);
+                        dp.Context().Teams.Add(team);
                         allTeams.Add(team);
-                        context.SaveChanges();
+                        dp.Context().SaveChanges();
     
                     }
                     else
@@ -75,26 +79,14 @@ public class JsonImporter
                             foreach (var newExpense in team.budget.expenses)
                             {
                                 newExpense.BudgetId = existingTeam.budget.Id;
-
-                                //  Ne adjuk hozzá, ha már létezik ugyanolyan költség
-                                bool isDuplicate = existingTeam.budget.expenses.Any(e =>
-                                    e.expenseDate == newExpense.expenseDate &&
-                                    e.amount == newExpense.amount &&
-                                    e.category == newExpense.category);
-
-                                if (!isDuplicate)
-                                {
-                                    context.Expenses.Add(newExpense);
-                                }
+                                dp.Context().Expenses.Add(newExpense);
                             }
-
-                            
                             allTeams.Add(existingTeam);
-                            context.SaveChanges();
+                            dp.Context().SaveChanges();
 
                         }
                     }
-                }
+
             }
         }
 
@@ -118,11 +110,8 @@ public class JsonImporter
             var team = ReadJsonFile(filePath);
             if (team == null) continue;
 
-            using (var context = new FormulaOneDbContext())
-            {
-          
                 // Ellenőrizzük, hogy létezik-e már a csapat a megfelelő évvel
-                var existingTeam = context.Teams
+                var existingTeam = dp.Context().Teams
                     .Include(t => t.budget)
                     .ThenInclude(b => b.expenses)
                     .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
@@ -131,8 +120,8 @@ public class JsonImporter
                 {
      
                     // Ha nem létezik, új csapatot adunk hozzá
-                    context.Teams.Add(team);
-                    context.SaveChanges();
+                    dp.Context().Teams.Add(team);
+                    dp.Context().SaveChanges();
                     allTeams.Add(team);
                 }
                 else
@@ -153,14 +142,13 @@ public class JsonImporter
 
                             if (!isDuplicate)
                             {
-                                context.Expenses.Add(newExpense);
+                                dp.Context().Expenses.Add(newExpense);
                             }
                         }
 
-                        context.SaveChanges();
+                        dp.Context().SaveChanges();
                         allTeams.Add(existingTeam);
                     }
-                }
             }
         }
 
