@@ -7,12 +7,14 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 {
     public interface ITeamDataProvider
     {
+        List<TeamEntity> GetTeamsPaged(int page, int size);
         public List<TeamEntity> Search(string field, string value, string searchType);
         public bool Delete(string id);
         public TeamEntity GetById(string id);
         public bool Update(TeamEntity team);
-        FormulaOneDbContext Context();
+        public List<TeamEntity> GetAll();
     }
+
 
     public class TeamDataProvider : ITeamDataProvider
     {
@@ -23,6 +25,14 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             this._context = context;
         }
 
+        public List<TeamEntity> GetTeamsPaged(int page, int size)
+        {
+            return _context.Teams
+                .OrderBy(t => t.year)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToList();
+        }
 
         public List<TeamEntity> Search(string field, string value, string searchType)
         {
@@ -104,9 +114,9 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             return true;
         }
 
-        public FormulaOneDbContext Context()
+        public List<TeamEntity> GetAll()
         {
-            return _context; 
+            return _context.Teams.ToList();
         }
     }
 }

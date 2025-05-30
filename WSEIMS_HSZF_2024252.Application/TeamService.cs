@@ -20,39 +20,35 @@ namespace WSEIMS_HSZF_2024252.Application
         }
     public class TeamService : ITeamService
     {
-        private readonly ITeamDataProvider _context;
+        private readonly ITeamDataProvider dp;
 
-        public TeamService(ITeamDataProvider context)
+        public TeamService(ITeamDataProvider dp)
         {
-            _context = context;
+            this.dp = dp;
         }
 
        public List<TeamEntity> GetTeamsPaged(int page, int size)
         {
-            return _context.Context().Teams
-                .OrderBy(t => t.year)
-                .Skip((page - 1) * size)
-                .Take(size)
-                .ToList();
+            return dp.GetTeamsPaged(page, size);
         }
         public List<TeamEntity> Search(string field, string value, string searchType)
         {
-           return _context.Search(field, value, searchType);
+           return dp.Search(field, value, searchType);
         }
 
         public bool Delete(string id)
         {
-            return _context.Delete(id);
+            return dp.Delete(id);
         }
 
         public TeamEntity GetById(string id)
         {
-            return _context.GetById(id);
+            return dp.GetById(id);
         }
 
         public bool Update(TeamEntity team)
         {
-            return _context.Update(team);
+            return dp.Update(team);
         }
 
         public List<TeamEntity> ImportFromDirectory(string path)

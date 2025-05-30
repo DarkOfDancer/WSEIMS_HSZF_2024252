@@ -76,7 +76,7 @@ public class JsonImporter
                             {
                                 newExpense.BudgetId = existingTeam.budget.Id;
 
-                                // (Opcionális) Ne adjuk hozzá, ha már létezik ugyanolyan költség
+                                //  Ne adjuk hozzá, ha már létezik ugyanolyan költség
                                 bool isDuplicate = existingTeam.budget.expenses.Any(e =>
                                     e.expenseDate == newExpense.expenseDate &&
                                     e.amount == newExpense.amount &&
