@@ -74,6 +74,7 @@ public class JsonImporter
                     }
                     else
                     {
+                    //Meglévő csapathoz kiadás hozzáadás
                         if (team.budget?.expenses != null && team.budget.expenses.Any())
                         {
                             foreach (var newExpense in team.budget.expenses)

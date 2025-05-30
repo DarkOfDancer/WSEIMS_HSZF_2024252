@@ -20,7 +20,7 @@ namespace WSEIMS_HSZF_2024252.Application
         }
     public class TeamService : ITeamService
     {
-        private readonly ITeamDataProvider dp;
+        protected readonly ITeamDataProvider dp;
 
         public TeamService(ITeamDataProvider dp)
         {
@@ -99,7 +99,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public List<TeamEntity> ImportFromDirectory(string path)
         {
-            var importer = new JsonImporter();
+            var importer = new JsonImporter(dp);
             var importedTeams = importer.ImportTeamsFromNEWDirectory(path);
             foreach (var team in importedTeams)
             {
