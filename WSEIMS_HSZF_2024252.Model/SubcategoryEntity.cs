@@ -15,7 +15,6 @@ namespace WSEIMS_HSZF_2024252.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        // A subcategory neve és összege
         [StringLength(100)]
         public string? name { get; set; }
         public int amount { get; set; }
