@@ -12,8 +12,9 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
         TeamEntity GetById(string id);
         bool Update(TeamEntity team);
         bool Delete(string id);
-        bool Save(TeamEntity team);
+        bool Add(TeamEntity team);
         FormulaOneDbContext Context();
+        TeamEntity GetTeamWithBudgetAndExpenses(string teamName, int year);
     }
 
 
@@ -73,7 +74,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             _context.SaveChanges();
             return true;
         }
-        public bool Save(TeamEntity team)
+        public bool Add(TeamEntity team)
         {
             if (team == null || string.IsNullOrWhiteSpace(team.Id))
                 return false;
@@ -85,6 +86,13 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             _context.Teams.Add(team);
             _context.SaveChanges();
             return true;
+        }
+        public TeamEntity GetTeamWithBudgetAndExpenses(string teamName, int year)
+        {
+            return _context.Teams
+                .Include(t => t.budget)
+                    .ThenInclude(b => b.expenses)
+                .FirstOrDefault(t => t.teamName == teamName && t.year == year);
         }
         public List<TeamEntity> GetAll()
         {

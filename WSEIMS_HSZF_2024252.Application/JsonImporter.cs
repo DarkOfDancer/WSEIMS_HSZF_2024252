@@ -2,22 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using WSEIMS_HSZF_2024252.Model;
 using WSEIMS_HSZF_2024252.Persistence.MsSql;
+
 public class JsonImporter
 {
     private readonly ITeamDataProvider dp;
-    public JsonImporter(ITeamDataProvider dp)
+    private readonly IBudgetDataProvider bp;
+
+    public JsonImporter(ITeamDataProvider dp, IBudgetDataProvider bp)
     {
         this.dp = dp;
+        this.bp = bp;
     }
+
     // Beolvasás egyetlen JSON fájlból
     public TeamEntity ReadJsonFile(string filePath)
     {
         try
         {
-            // JSON fájl beolvasása
             string json = File.ReadAllText(filePath);
 
             var options = new JsonSerializerOptions
@@ -25,24 +30,20 @@ public class JsonImporter
                 PropertyNameCaseInsensitive = true
             };
 
-            // A JSON deszerializálása TeamEntity típusra
             var team = JsonSerializer.Deserialize<TeamEntity>(json, options);
             return team;
         }
         catch (Exception)
         {
-            // Hiba esetén null visszaadása
             return null;
         }
     }
 
-    // Importálás a JSON fájlokból és adatbázisba
+    // Importálás JSON könyvtárból
     public List<TeamEntity> ImportTeamsFromJsonDirectory(string rootDirectory)
     {
         if (!Directory.Exists(rootDirectory))
-        {
             return null;
-        }
 
         var allTeams = new List<TeamEntity>();
         var yearDirectories = Directory.GetDirectories(rootDirectory);
@@ -59,51 +60,40 @@ public class JsonImporter
                 var team = ReadJsonFile(filePath);
                 if (team == null) continue;
 
+                var existingTeam = dp.GetTeamWithBudgetAndExpenses(team.teamName, team.year);
 
-                    var existingTeam =dp.Context().Teams
-                        .Include(t => t.budget)
-                        .ThenInclude(b => b.expenses)
-                        .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
-
-                    if (existingTeam == null)
+                if (existingTeam == null)
+                {
+                    dp.Add(team);
+                    allTeams.Add(team);
+                }
+                else
+                {
+                    if (team.budget?.expenses != null && team.budget.expenses.Any())
                     {
-                        dp.Context().Teams.Add(team);
-                        allTeams.Add(team);
-                        dp.Context().SaveChanges();
-    
-                    }
-                    else
-                    {
-                    //Meglévő csapathoz kiadás hozzáadás
-                        if (team.budget?.expenses != null && team.budget.expenses.Any())
+                        foreach (var newExpense in team.budget.expenses)
                         {
-                            foreach (var newExpense in team.budget.expenses)
-                            {
-                                newExpense.BudgetId = existingTeam.budget.Id;
-                                dp.Context().Expenses.Add(newExpense);
-                            }
-                            allTeams.Add(existingTeam);
-                            dp.Context().SaveChanges();
-
+                            newExpense.BudgetId = existingTeam.budget.Id;
+                            existingTeam.budget.expenses.Add(newExpense);
                         }
+                        bp.Update(existingTeam.budget);
+                        allTeams.Add(existingTeam);
                     }
-
+                }
             }
         }
 
         return allTeams;
     }
 
+    // Új könyvtárból importálás (csak fájlokat néz)
     public List<TeamEntity> ImportTeamsFromNEWDirectory(string rootDirectory)
     {
         if (!Directory.Exists(rootDirectory))
-        {
             return null;
-        }
 
         var allTeams = new List<TeamEntity>();
 
-        // Csak a fájlokat olvassuk be a rootDirectory-ból, nem pedig almappákat
         var files = Directory.GetFiles(rootDirectory, "*.json");
 
         foreach (var filePath in files)
@@ -111,61 +101,43 @@ public class JsonImporter
             var team = ReadJsonFile(filePath);
             if (team == null) continue;
 
-                // Ellenőrizzük, hogy létezik-e már a csapat a megfelelő évvel
-                var existingTeam = dp.Context().Teams
-                    .Include(t => t.budget)
-                    .ThenInclude(b => b.expenses)
-                    .FirstOrDefault(t => t.teamName == team.teamName && t.year == team.year);
+            var existingTeam = dp.GetTeamWithBudgetAndExpenses(team.teamName, team.year);
 
-                if (existingTeam == null)
+            if (existingTeam == null)
+            {
+                dp.Add(team);
+                allTeams.Add(team);
+            }
+            else
+            {
+                if (team.budget?.expenses != null && team.budget.expenses.Any())
                 {
-     
-                    // Ha nem létezik, új csapatot adunk hozzá
-                    dp.Context().Teams.Add(team);
-                    dp.Context().SaveChanges();
-                    allTeams.Add(team);
-                }
-                else
-                {
-
-                    // Ha létezik, hozzáadjuk az új költségeket, ha nem léteznek már
-                    if (team.budget?.expenses != null && team.budget.expenses.Any())
+                    foreach (var newExpense in team.budget.expenses)
                     {
-                        foreach (var newExpense in team.budget.expenses)
+                        newExpense.BudgetId = existingTeam.budget.Id;
+
+                        bool isDuplicate = existingTeam.budget.expenses.Any(e =>
+                            e.expenseDate == newExpense.expenseDate &&
+                            e.amount == newExpense.amount &&
+                            e.category == newExpense.category);
+
+                        if (!isDuplicate)
                         {
-                            newExpense.BudgetId = existingTeam.budget.Id;
-
-                            // Ne adjuk hozzá, ha már létezik ugyanolyan költség
-                            bool isDuplicate = existingTeam.budget.expenses.Any(e =>
-                                e.expenseDate == newExpense.expenseDate &&
-                                e.amount == newExpense.amount &&
-                                e.category == newExpense.category);
-
-                            if (!isDuplicate)
-                            {
-                                dp.Context().Expenses.Add(newExpense);
-                            }
+                            existingTeam.budget.expenses.Add(newExpense);
                         }
-
-                        dp.Context().SaveChanges();
-                        allTeams.Add(existingTeam);
                     }
+
+                    bp.Update(existingTeam.budget);
+                    allTeams.Add(existingTeam);
+                }
             }
         }
 
         return allTeams;
     }
 
-
-    // Ellenőrizzük, hogy a mappa neve tartalmaz-e évet (4 számjegy)
     private bool IsYearFolder(string folderName)
     {
-        // Ellenőrizzük, hogy a mappa neve 4 számjegyből áll (pl. 2023)
         return folderName.Length == 4 && folderName.All(char.IsDigit);
     }
-
-
-
 }
-
-

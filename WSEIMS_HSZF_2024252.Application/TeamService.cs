@@ -97,7 +97,7 @@ namespace WSEIMS_HSZF_2024252.Application
 
         public List<TeamEntity> ImportFromDirectory(string path)
         {
-            var importer = new JsonImporter(dp);
+            var importer = new JsonImporter(dp,bp);
             var importedTeams = importer.ImportTeamsFromNEWDirectory(path);
             foreach (var team in importedTeams)
             {
