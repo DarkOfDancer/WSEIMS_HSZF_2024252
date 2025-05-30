@@ -10,7 +10,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 {
     public interface IBudgetReportService
     {
-        void GeneratePredictionReport(string teamName, double plannedBudget);
+        bool GeneratePredictionReport(string teamName, double plannedBudget);
         List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year);
 
     }
@@ -23,7 +23,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
             _context = context;
         }
 
-        public void GeneratePredictionReport(string teamName, double plannedBudget)
+        public bool GeneratePredictionReport(string teamName, double plannedBudget)
         {
             var recentBudgets = _context.Context().Budgets
                 .Include(b => b.expenses)
@@ -41,9 +41,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 
             if (!recentBudgets.Any())
             {
-                Console.WriteLine("Nincs elérhető adat a megadott csapathoz az elmúlt 2 évből.");
-                Thread.Sleep(5000);
-                return;
+                return false;
             }
 
             var categories = new[] { "Car", "Personnel", "Operations" };
@@ -100,8 +98,7 @@ namespace WSEIMS_HSZF_2024252.Persistence.MsSql
 
             File.WriteAllLines(filePath, reportLines);
 
-            Console.WriteLine($"Riport generálva: {filePath}");
-            Thread.Sleep(2000);
+            return true;
         }
 
         public List<(string Category, double TotalAmount)> GetExpenseReportByYearAndTeam(string teamName, int year)

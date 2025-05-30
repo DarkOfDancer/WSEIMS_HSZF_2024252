@@ -125,7 +125,13 @@ namespace WSEIMS_HSZF_2024252
             Console.Write("Add meg a tervezett költségvetést (szám): ");
             if (double.TryParse(Console.ReadLine(), out double budget))
             {
-                service.GeneratePredictionReport(teamName, budget);
+                if (service.GeneratePredictionReport(teamName, budget)==false)
+                {
+                    Console.WriteLine("Nincs elég adat az elmúlt két évből!");
+                }else
+                {
+                    Console.WriteLine("Riport generálva a Riports mappába!");
+                }       
                 Thread.Sleep(5000);
             }
             else
@@ -133,6 +139,7 @@ namespace WSEIMS_HSZF_2024252
                 Console.WriteLine("Érvénytelen összeg.");
                 Thread.Sleep(5000);
             }
+            
             Console.Clear();
         }
 
